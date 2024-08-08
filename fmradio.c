@@ -141,11 +141,11 @@ int fm_setvol(int fd, int vol) {
 int fm_getvol(int fd, int *vol) {
     int ret = 0;
 
-    ret = ioctl(fd, FM_IOCTL_GETVOL, &vol);
+    ret = ioctl(fd, FM_IOCTL_GETVOL, vol);
     if (ret < 0)
         perror("FM_IOCTL_GETVOL failed");
     else
-        printf("fm_getvol: [vol=%d] [ret=%d]\n", vol, ret);
+        printf("fm_getvol: [vol=%d] [ret=%d]\n", *vol, ret);
 
     return ret;
 }

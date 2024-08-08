@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="4.0"/>
+  <object class="GtkAdjustment" id="volume_adjustment">
+    <property name="lower">0</property>
+    <property name="upper">15</property>
+    <property name="value">7</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">3</property>
+  </object>
+  <object class="GtkApplicationWindow" id="window">
+    <property name="title">FM Radio</property>
+    <property name="default-width">400</property>
+    <property name="default-height">500</property>
+    <child>
+      <object class="GtkBox" id="main_box">
+        <property name="orientation">vertical</property>
+        <property name="spacing">10</property>
+        <property name="margin-start">20</property>
+        <property name="margin-end">20</property>
+        <property name="margin-top">20</property>
+        <property name="margin-bottom">20</property>
+        <child>
+          <object class="GtkLabel" id="frequency_display">
+            <property name="label">MHz</property>
+            <style>
+              <class name="frequency-display"/>
+            </style>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox" id="tuning_box">
+            <property name="orientation">horizontal</property>
+            <property name="spacing">10</property>
+            <property name="halign">center</property>
+            <child>
+              <object class="GtkButton" id="tune_down_button">
+                <property name="label">-</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkEntry" id="frequency_entry">
+                <property name="placeholder-text">87.5 - 108.0</property>
+                <property name="max-width-chars">10</property>
+                <property name="width-chars">10</property>
+                <property name="height-request">10</property>
+                <property name="xalign">0.5</property>
+                <style>
+                  <class name="larger-text"/>
+                </style>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="tune_up_button">
+                <property name="label">+</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox" id="preset_box">
+            <property name="orientation">horizontal</property>
+            <property name="spacing">5</property>
+            <property name="homogeneous">true</property>
+            <child>
+              <object class="GtkButton" id="preset_1">
+                <property name="label">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="preset_2">
+                <property name="label">2</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="preset_3">
+                <property name="label">3</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="preset_4">
+                <property name="label">4</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="preset_5">
+                <property name="label">5</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox" id="volume_box">
+            <property name="orientation">horizontal</property>
+            <property name="spacing">10</property>
+            <child>
+              <object class="GtkLabel" id="volume_label">
+                <property name="label">Volume:</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkScale" id="volume_scale">
+                <property name="adjustment">volume_adjustment</property>
+                <property name="draw-value">true</property>
+                <property name="value-pos">right</property>
+                <property name="hexpand">true</property>
+                <property name="digits">0</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkToggleButton" id="mute_button">
+                <property name="label">Mute</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox" id="control_box">
+            <property name="orientation">horizontal</property>
+            <property name="spacing">10</property>
+            <property name="homogeneous">true</property>
+            <child>
+              <object class="GtkButton" id="start_button">
+                <property name="label">Start</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="stop_button">
+                <property name="label">Stop</property>
+                <property name="sensitive">false</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow" id="scrolled_window">
+            <property name="vexpand">true</property>
+            <child>
+              <object class="GtkTextView" id="output_text_view">
+                <property name="editable">false</property>
+                <property name="wrap-mode">word-char</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
