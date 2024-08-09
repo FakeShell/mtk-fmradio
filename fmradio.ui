@@ -58,6 +58,23 @@
           </object>
         </child>
         <child>
+          <object class="GtkBox" id="seek_box">
+            <property name="orientation">horizontal</property>
+            <property name="spacing">10</property>
+            <property name="halign">center</property>
+            <child>
+              <object class="GtkButton" id="seek_down_button">
+                <property name="label">◀◀ Seek</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="seek_up_button">
+                <property name="label">Seek ▶▶</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
           <object class="GtkBox" id="preset_box">
             <property name="orientation">horizontal</property>
             <property name="spacing">5</property>

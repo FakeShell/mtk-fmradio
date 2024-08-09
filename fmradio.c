@@ -120,7 +120,7 @@ int fm_seek(int fd, int *freq, int band, int dir, int lev) {
         perror("FM_IOCTL_SEEK failed");
     else {
         *freq = parm.freq;
-        printf("fm_seek: [ret=%d]\n", ret);
+        printf("fm_seek: [freq=%d] [ret=%d]\n", *freq, ret);
     }
 
     return ret;

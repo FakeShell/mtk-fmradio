@@ -18,9 +18,12 @@ static GtkTextBuffer *output_buffer;
 static GtkWidget *volume_scale;
 static GtkWidget *tune_up_button;
 static GtkWidget *tune_down_button;
+static GtkWidget *seek_up_button;
+static GtkWidget *seek_down_button;
 static GtkWidget *preset_buttons[5];
 static GtkWidget *mute_button;
 static gboolean is_muted = FALSE;
+static int current_frequency = 8750;
 
 static void append_to_output(const char *format, ...) {
     va_list args;
@@ -97,7 +100,7 @@ static void on_start_clicked(GtkButton *button, gpointer user_data) {
         return;
     }
 
-    int freq = (int)(freq_float * 100);
+    current_frequency = (int)(freq_float * 100);
 
     int ret = fm_open_dev(FM_DEV, &fd);
     if (ret < 0) {
@@ -105,7 +108,7 @@ static void on_start_clicked(GtkButton *button, gpointer user_data) {
         return;
     }
 
-    ret = fm_powerup(fd, FM_BAND_UE, freq);
+    ret = fm_powerup(fd, FM_BAND_UE, current_frequency);
     if (ret < 0) {
         append_to_output("Error powering up");
         fm_close_dev(fd);
@@ -127,6 +130,8 @@ static void on_start_clicked(GtkButton *button, gpointer user_data) {
     gtk_widget_set_sensitive(stop_button, TRUE);
     gtk_widget_set_sensitive(tune_up_button, TRUE);
     gtk_widget_set_sensitive(tune_down_button, TRUE);
+    gtk_widget_set_sensitive(seek_up_button, TRUE);
+    gtk_widget_set_sensitive(seek_down_button, TRUE);
     gtk_widget_set_sensitive(volume_scale, TRUE);
     gtk_widget_set_sensitive(mute_button, TRUE);
 
@@ -208,8 +213,8 @@ static void on_tune_clicked(GtkButton *button, gpointer user_data) {
     snprintf(new_freq_str, sizeof(new_freq_str), "%.1f", freq);
     gtk_editable_set_text(GTK_EDITABLE(frequency_entry), new_freq_str);
 
-    int freq_int = (int)(freq * 100);
-    int ret = fm_tune(fd, freq_int, FM_BAND_UE); // maybe make configurable in a settings page
+    current_frequency = (int)(freq * 100);
+    int ret = fm_tune(fd, current_frequency, FM_BAND_UE); // maybe make configurable in a settings page
     if (ret < 0) {
         append_to_output("Error tuning to new frequency");
     } else {
@@ -224,6 +229,32 @@ static void on_preset_clicked(GtkButton *button, gpointer user_data) {
     // make it configurable i guess? my dads car had the 1 2 3 4 5 buttons and they were configurable
 }
 
+static void on_seek_clicked(GtkButton *button, gpointer user_data) {
+    int direction = GPOINTER_TO_INT(user_data);
+    int ret;
+    int freq = current_frequency;
+    float freq_formatted;
+
+    // 1 for up, 0 for down
+    ret = fm_seek(fd, &freq, FM_BAND_UE, direction, FM_SEEKTH_LEVEL_DEFAULT);
+
+    if (ret < 0) {
+        append_to_output("Error seeking to new frequency");
+        return;
+    }
+
+    printf("freq: %d", freq);
+    current_frequency = freq;
+    freq_formatted = freq / 100.0;
+
+    char freq_str[10];
+    snprintf(freq_str, sizeof(freq_str), "%.1f", freq_formatted);
+    gtk_editable_set_text(GTK_EDITABLE(frequency_entry), freq_str);
+
+    update_frequency_display(freq_formatted);
+    append_to_output("Seeked to %.1f MHz", freq_formatted);
+}
+
 static void activate(GtkApplication *app, gpointer user_data) {
     GtkBuilder *builder;
     GtkWidget *window;
@@ -236,13 +267,14 @@ static void activate(GtkApplication *app, gpointer user_data) {
 
     frequency_display = GTK_WIDGET(gtk_builder_get_object(builder, "frequency_display"));
     frequency_entry = GTK_WIDGET(gtk_builder_get_object(builder, "frequency_entry"));
-//    gtk_entry_set_input_purpose(GTK_ENTRY(frequency_entry), GTK_INPUT_PURPOSE_NUMBER); // nicer but no "."
     start_button = GTK_WIDGET(gtk_builder_get_object(builder, "start_button"));
     stop_button = GTK_WIDGET(gtk_builder_get_object(builder, "stop_button"));
     output_text_view = GTK_WIDGET(gtk_builder_get_object(builder, "output_text_view"));
     volume_scale = GTK_WIDGET(gtk_builder_get_object(builder, "volume_scale"));
     tune_up_button = GTK_WIDGET(gtk_builder_get_object(builder, "tune_up_button"));
     tune_down_button = GTK_WIDGET(gtk_builder_get_object(builder, "tune_down_button"));
+    seek_up_button = GTK_WIDGET(gtk_builder_get_object(builder, "seek_up_button"));
+    seek_down_button = GTK_WIDGET(gtk_builder_get_object(builder, "seek_down_button"));
     mute_button = GTK_WIDGET(gtk_builder_get_object(builder, "mute_button"));
 
     output_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(output_text_view));
@@ -253,6 +285,8 @@ static void activate(GtkApplication *app, gpointer user_data) {
     g_signal_connect(volume_scale, "value-changed", G_CALLBACK(on_volume_changed), NULL);
     g_signal_connect(tune_up_button, "clicked", G_CALLBACK(on_tune_clicked), NULL);
     g_signal_connect(tune_down_button, "clicked", G_CALLBACK(on_tune_clicked), NULL);
+    g_signal_connect(seek_up_button, "clicked", G_CALLBACK(on_seek_clicked), GINT_TO_POINTER(1));
+    g_signal_connect(seek_down_button, "clicked", G_CALLBACK(on_seek_clicked), GINT_TO_POINTER(0));
     g_signal_connect(mute_button, "toggled", G_CALLBACK(on_mute_toggled), NULL);
 
     for (int i = 0; i < 5; i++) {
@@ -264,6 +298,8 @@ static void activate(GtkApplication *app, gpointer user_data) {
 
     gtk_widget_set_sensitive(tune_up_button, FALSE);
     gtk_widget_set_sensitive(tune_down_button, FALSE);
+    gtk_widget_set_sensitive(seek_up_button, FALSE);
+    gtk_widget_set_sensitive(seek_down_button, FALSE);
     gtk_widget_set_sensitive(volume_scale, FALSE);
     gtk_widget_set_sensitive(mute_button, FALSE);
 
