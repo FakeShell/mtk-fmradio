@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) 2024 Bardia Moshiri
+ * SPDX-License-Identifier: GPL-3.0+
+ * Author: Bardia Moshiri <bardia@furilabs.com>
+ */
+
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <fcntl.h>
