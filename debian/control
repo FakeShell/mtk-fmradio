@@ -1,0 +1,15 @@
+Source: mtk-fmradio
+Maintainer: Bardia Moshiri <bardia@furilabs.com>
+Section: misc
+Priority: optional
+Build-Depends: debhelper-compat (= 13),
+               gcc,
+               libgtk-4-dev,
+Standards-Version: 4.5.1
+Vcs-Browser: https://github.com/furilabs/mtk-fmradio
+Vcs-Git: https://github.com/furilabs/mtk-fmradio.git
+
+Package: mtk-fmradio
+Architecture: any
+Depends: ${misc:Depends}
+Description: fmradio client for MediaTek chipsets with a GTK4 UI
